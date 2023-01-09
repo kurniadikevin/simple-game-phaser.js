@@ -12,20 +12,35 @@ class GameScene extends Phaser.Scene{
      preload ()
     {
 
-       // this.load.image('sky', 'assets/background-day.jpg');
+        this.load.image('bgImg1', 'assets/mountain-background.jpg');
         this.load.spritesheet('player', 'assets/flatboy_ss_full01.png'
         ,{ frameWidth: 616, frameHeight: 525 });
         this.load.image('ground', 'assets/platform.jpg');
+        this.load.image('bgImg2','./assets/tree-background01.png');
     }
 
      create ()
     {
-      //  gameState.background =this.add.image(490, 300, 'sky').setScale(0.19);
+        
+        gameState.background =this.add.image(960, 300, 'bgImg1').setScale(1);
+        gameState.backgroundMirror =this.add.image(2880, 300, 'bgImg1').setScale(1);
+        gameState.backgroundMirror.flipX = true;
+
+        gameState.backgroundTree = this.add.image(960, 450, 'bgImg2').setScale(1);
+        gameState.backgroundTreeMirror = this.add.image(2880, 450, 'bgImg2').setScale(1);
+      //  gameState.backgroundTreeMirror.flipX= true;
+
 
         gameState.player = this.physics.add.sprite(50,400, 'player')
         .setScale(0.15);
+        
+        const platforms = this.physics.add.staticGroup();
+        platforms.create(750, 819, 'ground').setScale(0.3).refreshBody();
+        platforms.create(2251, 819, 'ground').setScale(0.3).refreshBody();
+
 
         //animation from spriteSheet
+
         //run
         this.anims.create({
             key: 'run',
@@ -50,9 +65,7 @@ class GameScene extends Phaser.Scene{
             repeat: -1
           });
 
-        const platforms = this.physics.add.staticGroup();
-        platforms.create(750, 819, 'ground').setScale(0.3).refreshBody();
-        platforms.create(2251, 819, 'ground').setScale(0.3).refreshBody();
+       
 
         gameState.player.setCollideWorldBounds(true);
         this.physics.add.collider(gameState.player, platforms);
@@ -64,6 +77,25 @@ class GameScene extends Phaser.Scene{
         this.physics.world.setBounds(0, 0, gameState.width, gameState.height);
         this.cameras.main.startFollow(gameState.player,true,0.5,0.5);
     }
+
+   /*  createParallaxBackgrounds(){
+        gameState.bg1 = this.add.image(0, 0, 'bgImg1');
+        gameState.bg2 = this.add.image(0, 0, 'bgImg2');
+
+        gameState.bg1.setOrigin(0, 0);
+        gameState.bg2.setOrigin(0, 0);
+
+        const game_width = parseFloat(gameState.bg1.getBounds().width)
+        gameState.width = game_width;
+        const window_width = config.width;
+
+        const bg1_width = gameState.bg1.getBounds().width;
+        const bg2_width = gameState.bg2.getBounds().width;
+
+        //set scroll factor
+        gameState.bg1.setScrollFactor((bg1_width - window_width) / (game_width - window_width)); 
+        gameState.bg2.setScrollFactor((bg2_width - window_width) / (game_width - window_width));
+    } */
 
      update()
     {
@@ -89,6 +121,8 @@ class GameScene extends Phaser.Scene{
             gameState.player.setVelocityX(0);
             gameState.player.anims.play('idle',true);
         }
+
+       
     }
 
 

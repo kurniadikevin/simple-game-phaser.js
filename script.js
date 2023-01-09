@@ -1,5 +1,7 @@
 const gameState = {
- playerSpeed : 160
+ playerSpeed : 160,
+ width : 3000,
+ height : 900
 }
 
 class GameScene extends Phaser.Scene{
@@ -10,15 +12,15 @@ class GameScene extends Phaser.Scene{
      preload ()
     {
 
-        this.load.image('sky', 'assets/background-day.jpg');
-        this.load.spritesheet('player', 'assets/flatboy_ss_full.png'
-        ,{ frameWidth: 616, frameHeight: 566 });
+       // this.load.image('sky', 'assets/background-day.jpg');
+        this.load.spritesheet('player', 'assets/flatboy_ss_full01.png'
+        ,{ frameWidth: 616, frameHeight: 525 });
         this.load.image('ground', 'assets/platform.jpg');
     }
 
      create ()
     {
-        gameState.background =this.add.image(490, 300, 'sky').setScale(0.13);
+      //  gameState.background =this.add.image(490, 300, 'sky').setScale(0.19);
 
         gameState.player = this.physics.add.sprite(50,400, 'player')
         .setScale(0.15);
@@ -49,13 +51,18 @@ class GameScene extends Phaser.Scene{
           });
 
         const platforms = this.physics.add.staticGroup();
+        platforms.create(750, 819, 'ground').setScale(0.3).refreshBody();
+        platforms.create(2251, 819, 'ground').setScale(0.3).refreshBody();
 
-        platforms.create(490, 547, 'ground').setScale(0.3).refreshBody();
         gameState.player.setCollideWorldBounds(true);
         this.physics.add.collider(gameState.player, platforms);
 
-		gameState.cursors = this.input.keyboard.createCursorKeys();       
+		gameState.cursors = this.input.keyboard.createCursorKeys();
         
+        //camera setting
+        this.cameras.main.setBounds(0, 0, gameState.width, gameState.height);
+        this.physics.world.setBounds(0, 0, gameState.width, gameState.height);
+        this.cameras.main.startFollow(gameState.player,true,0.5,0.5);
     }
 
      update()
@@ -89,15 +96,16 @@ class GameScene extends Phaser.Scene{
 
 var config = {
     type: Phaser.AUTO,
-    width: 980,
+    width: 800,
     height: 600,
     physics: {
         default: 'arcade',
         arcade: {
-            gravity: { y: 200 },
+            gravity: { y: 300 },
             enableBody : true,
         }
     },
+    backgroundColor: "F1FAEF",
     scene: [GameScene]
 };
 

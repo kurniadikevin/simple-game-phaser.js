@@ -4,11 +4,13 @@ const gameState = {
  width : 3000,
  height : 900,
 
+ 
  // place step by grid 50 x 15
  // left to right and down to up coordinate
  // if y is zero it is on ground platform
  // format [x,y]
- levelStepSetup : [[5,0],[6,0],[7,1],[9,3],[10,4]]
+ levelStepSetup : [[5,0],[6,0],[7,1],[9,3],[10,4],[10.5,4],[11,4],[13,4], [15,5],
+                    [17,7],[19,4],[20,4],[22,2],[5,3],[18,9]]
 }
 
 class GameScene extends Phaser.Scene{
@@ -20,8 +22,8 @@ class GameScene extends Phaser.Scene{
     {
 
         this.load.image('bgImg1', 'assets/mountain-background.jpg');
-        this.load.spritesheet('player', 'assets/flatboy_ss_full01.png'
-        ,{ frameWidth: 616, frameHeight: 525 });
+        this.load.spritesheet('player', 'assets/flatboySS-noPadding.png'
+        ,{ frameWidth: 350, frameHeight: 500 });
         this.load.image('ground', 'assets/platform.jpg');
         this.load.image('bgImg2','./assets/tree-background01.png');
         this.load.image('stoneStep','./assets/stoneMedium.png');
@@ -141,6 +143,7 @@ var config = {
     physics: {
         default: 'arcade',
         arcade: {
+            debug : true,
             gravity: { y: 300 },
             enableBody : true,
         }

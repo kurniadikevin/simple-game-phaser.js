@@ -1,5 +1,5 @@
 const gameState = {
- playerSpeed : 160,
+ playerSpeed : 200,
  jumpPower : 300,
  width : 3000,
  height : 900,
@@ -9,8 +9,10 @@ const gameState = {
  // left to right and down to up coordinate
  // if y is zero it is on ground platform
  // format [x,y]
- levelStepSetup : [[5,0],[6,0],[7,1],[9,3],[10,4],[10.5,4],[11,4],[13,4], [15,5],
-                    [17,7],[19,4],[20,4],[22,2],[5,3],[18,9]]
+ levelStepSetup : [
+    [5,0],[6,0],[7,1],[9,3],[10,4],[10.5,4],[11,4],[13,4], [15,5],
+    [17,7],[19,4],[20,4],[22,2],[5,3],[18,9]
+                ]
 }
 
 class GameScene extends Phaser.Scene{
@@ -90,7 +92,7 @@ class GameScene extends Phaser.Scene{
 
 
 
-   createStep(xIndex, yIndex) {
+ createStep(xIndex, yIndex) {
         // Creates a platform evenly spaced along the two indices.
         // If either is not a number it won't make a platform
           if (typeof yIndex === 'number' && typeof xIndex === 'number') {
@@ -126,11 +128,17 @@ class GameScene extends Phaser.Scene{
             else if(gameState.cursors.up.isDown || gameState.cursors.space.isDown) {
                 gameState.player.anims.play('jump',true);
             }
+           
         else{
             gameState.player.setVelocityX(0);
             gameState.player.anims.play('idle',true);
         }
+
+         if (gameState.player.body.position.y === 0){
+            alert('you reach sky');
+        }
        
+        //console.log(gameState.player.body.position.y);
     }
 
 

@@ -3,21 +3,18 @@ const gameState = {
  jumpPower : 300,
  width : 3000,
  height : 900,
-
- 
- // place step by grid 50 x 15
- // left to right and down to up coordinate
- // if y is zero it is on ground platform
- // format [x,y]
- levelStepSetup : [
-    [5,0],[6,0],[7,1],[9,3],[10,4],[10.5,4],[11,4],[13,4], [15,5],
-    [17,7],[19,4],[20,4],[22,2],[5,3],[18,9]
-                ]
 }
 
 class GameScene extends Phaser.Scene{
-    constructor(){
-		super({ key: 'GameScene' });
+    constructor(key){
+		super( key );
+        this.levelKey = key
+        this.nextLevel = {
+          'Level1': 'Level2',
+          'Level2': 'Level3',
+          'Level3': 'Level4',
+          'Level4': 'Credits',
+        }
 	}
 
      preload ()
@@ -91,18 +88,17 @@ class GameScene extends Phaser.Scene{
     }
 
 
-
+    // create step on game from input
  createStep(xIndex, yIndex) {
-        // Creates a platform evenly spaced along the two indices.
-        // If either is not a number it won't make a platform
           if (typeof yIndex === 'number' && typeof xIndex === 'number') {
             gameState.step.create((60 * xIndex),  720-(yIndex * 60), 'stoneStep').setScale(0.24).refreshBody();
           }
       }
  
+      
   stepSetup(){
-    for( let i= 0 ; i< (gameState.levelStepSetup).length; i++){
-        this.createStep(gameState.levelStepSetup[i][0],gameState.levelStepSetup[i][1]);
+    for( let i= 0 ; i< (this.levelStepSetup).length; i++){
+        this.createStep(this.levelStepSetup[i][0],this.levelStepSetup[i][1]);
     }
   }
 
@@ -135,14 +131,42 @@ class GameScene extends Phaser.Scene{
         }
 
          if (gameState.player.body.position.y === 0){
-            alert('you reach sky');
+            alert(`you reach sky on ${this.levelKey}`);
+            this.scene.stop(this.levelKey);
+            this.scene.start(this.nextLevel[this.levelKey]);
+            
         }
        
         //console.log(gameState.player.body.position.y);
     }
-
-
 }
+
+
+ // levelStepSetup guide :
+ // place step by grid 50 x 15
+ // left to right and down to up coordinate
+ // if y is zero it is on ground platform
+ // format [x,y]
+
+
+class Level1 extends GameScene {
+    constructor() {
+      super('Level1')
+      
+      this.levelStepSetup = [
+        [5,0],[6,0],[7,1],[9,3],[10,4],[10.5,4],[11,4],[13,4], [15,5],
+        [17,7],[19,4],[20,4],[22,2],[5,3],[18,9]
+                    ];
+    }
+  }
+
+  class Level2 extends GameScene {
+    constructor() {
+      super('Level2')
+      this.levelStepSetup = [ [5,0],[6,0],[7,1],[48,1],[47,2],[46,3],[45,4],[44,5]];
+    }
+  }
+
 
 var config = {
     type: Phaser.AUTO,
@@ -157,7 +181,7 @@ var config = {
         }
     },
     backgroundColor: "F1FAEF",
-    scene: [GameScene]
+    scene: [Level1,Level2]
 };
 
 

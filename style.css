@@ -7,7 +7,16 @@ body{
 .caption{
     position: absolute;
     top: 100px;
+    font-family:Georgia, 'Times New Roman', Times, serif;
+    font-size: 25px;
+    color: #4D4337;
+}
+
+.rule{
+    position: absolute;
+    top: 660px;
     font-family: 'Quicksand';
     font-size: 20px;
-    color: #4D4337;
+    color: #4D4337;  
+    font-size: 23px;
 }

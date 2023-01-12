@@ -197,15 +197,18 @@ class GameScene extends Phaser.Scene{
  // format [x,y]
 
 
+ // min trampoline coordinate y to reach sky = 4
+ // min step coordinate y to reach skt = 8
+
 class Level1 extends GameScene {
     constructor() {
       super('Level1')
       
       this.levelStepSetup = [
         [5,0],[6,0],[7,1],[9,3],[10,4],[10.5,4],[11,4],[13,4], [15,5],
-        [17,7],[19,4],[20,4],[22,2],[5,3],[18,9]
+        [17,7],[19,4],[20,4],[22,2],[5,3],[18,8]
                     ];
-      this.levelTrampolineSetup = [[9,3],[10,4],[10.5,4]];
+     
     }
   }
 
@@ -215,10 +218,32 @@ class Level1 extends GameScene {
       this.levelStepSetup = [  [5,0],[6,1],[7,2],[8,3],[9,4]];
    this.levelTrampolineSetup =[  [4,-1],  [5,0],[6,1],[7,2],[8,3],[9,4] ];
     
-   
     }
   }
 
+  class Level3 extends GameScene {
+    constructor() {
+      super('Level3')
+      
+      this.levelStepSetup = [
+        [5,0],[6,0],[7,1],[9,3],[10,4],[10.5,4],[11,4],[13,4], [15,5],
+        [17,7],[19,4],[20,4],[22,2],[5,3],[18,7]
+                    ];
+      this.levelTrampolineSetup = [[19,4]];
+    }
+  }
+
+  class Level4 extends GameScene {
+    constructor() {
+      super('Level4')
+      
+      this.levelStepSetup = [
+        [25,4],[25,5],[5,1],[8,6],[19,4],[26,2],[26,7],[28,2],[32,1],[35,2],[36,2],[37,5],[42,4]
+        
+];
+      this.levelTrampolineSetup = [[19,4],[42,4],[32,1]];
+    }
+  }
 
 let config = {
     type: Phaser.AUTO,
@@ -228,13 +253,13 @@ let config = {
     physics: {
         default: 'arcade',
         arcade: {
-            debug : true,
+            debug : false,
             gravity: { y: 300 },
             enableBody : true,
         }
     },
     backgroundColor: "F1FAEF",
-    scene: [Level1,Level2]
+    scene: [Level1,Level2,Level3,Level4]
 };
 
 

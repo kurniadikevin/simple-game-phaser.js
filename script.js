@@ -30,6 +30,7 @@ class GameScene extends Phaser.Scene{
         this.load.image('bgImg2','./assets/tree-background01.png');
         this.load.image('stoneStep','./assets/stoneMedium.png');
         this.load.image('trampoline','./assets/trampoline-crop.png');
+        this.load.image('leaf','./assets/leaf.png');
     }
 
 
@@ -62,6 +63,8 @@ class GameScene extends Phaser.Scene{
         if(this.levelTrampolineSetup){
           this.trampolineSetup();
         }
+
+        this.createLeaf();
 
        
         //ANIMATION FOR SPRITESHEET
@@ -128,6 +131,7 @@ class GameScene extends Phaser.Scene{
     }
     
 }
+
  
   //setup static object    
   stepSetup(){
@@ -142,6 +146,22 @@ class GameScene extends Phaser.Scene{
   }
   }
 
+  // create leaf particle
+  createLeaf() {
+    gameState.particles = this.add.particles('leaf');
+
+    gameState.emitter = gameState.particles.createEmitter({
+      x: {min: 0, max: config.width },
+      y:  {min: -20, max: 0  },
+      lifespan: 2000,
+      speedY: { min: 50, max: 100 },
+      speedX: { min: 0, max: -50 },
+      scale: { start: 0.017, end: 0.015 },
+      quantity: 1,
+      blendMode: 'MULTIPLY'
+    })
+    gameState.emitter.setScrollFactor(0.1);
+  }
 
   
      update()
@@ -156,11 +176,11 @@ class GameScene extends Phaser.Scene{
             gameState.player.flipX= false;
             gameState.player.anims.play('run',true);
 
-         } else if(gameState.cursors.down.isDown){
+         } /* else if(gameState.cursors.down.isDown){
             gameState.player.anims.play('crawl',true);// still error not collide and padding not reduced
             
             
-         }
+         } */
          
          else if( (Phaser.Input.Keyboard.JustDown(gameState.cursors.space) || Phaser.Input.Keyboard.JustDown(gameState.cursors.up)) &&
         gameState.player.body.touching.down){

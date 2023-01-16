@@ -168,14 +168,31 @@ class GameScene extends Phaser.Scene{
     this.physics.add.collider(gameState.zombie, gameState.platforms);
     gameState.zombieMove= this.tweens.add({
       targets: gameState.zombie,
-      x: (xIndex * 60) + 200,
+      x: (xIndex * 60) + 300,
       ease: 'Linear',
-      duration: 1500,
+      duration: Math.random() * 500+ 1500,
       repeat: -1,
       yoyo: true,
       flipX : true
     });
   }
+
+    // create leaf particle
+    createLeaf() {
+      gameState.particles = this.add.particles('leaf');
+  
+      gameState.emitter = gameState.particles.createEmitter({
+        x: {min: 0, max: config.width },
+        y:  {min: -20, max: 300  },
+        lifespan: 2000,
+        speedY: { min: 50, max: 150 },
+        speedX: { min: 0, max: -50 },
+        scale: { start: 0.017, end: 0.005 },
+        quantity: 1,
+        blendMode: 'ADD'
+      })
+      gameState.emitter.setScrollFactor(0.1);
+    }
 
  
   //setup static object    
@@ -195,22 +212,7 @@ class GameScene extends Phaser.Scene{
       this.createZombie(this.levelZombieSetup[i][0],this.levelZombieSetup[i][1]);
   }}
 
-  // create leaf particle
-  createLeaf() {
-    gameState.particles = this.add.particles('leaf');
 
-    gameState.emitter = gameState.particles.createEmitter({
-      x: {min: 0, max: config.width },
-      y:  {min: -20, max: 300  },
-      lifespan: 2000,
-      speedY: { min: 50, max: 150 },
-      speedX: { min: 0, max: -50 },
-      scale: { start: 0.017, end: 0.005 },
-      quantity: 1,
-      blendMode: 'ADD'
-    })
-    gameState.emitter.setScrollFactor(0.1);
-  }
 
   
      update()
@@ -337,7 +339,7 @@ let config = {
         }
     },
     backgroundColor: "F1FAEF",
-    scene: [Level1,Level2,Level3,Level4,Level5]
+    scene: [Level5]
 };
 
 

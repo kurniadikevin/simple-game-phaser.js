@@ -13,7 +13,7 @@ class GameScene extends Phaser.Scene{
           'Level1': 'Level2',
           'Level2': 'Level3',
           'Level3': 'Level4',
-          'Level4': 'Credits',
+          'Level4': 'Level5',
         }
 	}
 
@@ -24,7 +24,9 @@ class GameScene extends Phaser.Scene{
         this.load.spritesheet('player', 'assets/flatboySS-noPadding.png'
         ,{ frameWidth: 350, frameHeight: 500 });
        this.load.spritesheet('playerCrawl', 'assets/crawl-ss.png'
-        ,{ frameWidth: 481, frameHeight: 282 });
+        ,{ frameWidth: 481, frameHeight: 282 });//not used yet
+        this.load.spritesheet('zombie','./assets/zombie-enemy.png',{
+          frameWidth : 103, frameHeight : 139.75});
 
         this.load.image('ground', 'assets/platform.jpg');
         this.load.image('bgImg2','./assets/tree-background01.png');
@@ -36,6 +38,7 @@ class GameScene extends Phaser.Scene{
 
      create ()
     {
+        gameState.active = true;
         
         gameState.background =this.add.image(960, 300, 'bgImg1').setScale(1);
         gameState.backgroundMirror =this.add.image(2880, 300, 'bgImg1').setScale(1);
@@ -47,6 +50,9 @@ class GameScene extends Phaser.Scene{
         gameState.player = this.physics.add.sprite(50,600, 'player')
         .setScale(0.15);
         
+        gameState.zombiesGroup =this.physics.add.group({
+          collideWorldBounds: true
+      });
         
         gameState.platforms = this.physics.add.staticGroup();
         gameState.platforms.create(750, 819, 'ground').setScale(0.3).refreshBody();
@@ -64,7 +70,11 @@ class GameScene extends Phaser.Scene{
           this.trampolineSetup();
         }
 
+        if(this.levelZombieSetup){
+          this.zombieSetup();
+        }
         this.createLeaf();
+       
 
        
         //ANIMATION FOR SPRITESHEET
@@ -100,6 +110,15 @@ class GameScene extends Phaser.Scene{
             repeat: -1
           })
 
+          //zombie anims
+          this.anims.create({
+            key: 'walk',
+            frames: this.anims.generateFrameNumbers('zombie', { start: 0, end: 9 }),
+            frameRate: 10,
+            repeat: -1
+          });
+
+
         gameState.player.setCollideWorldBounds(true);
         this.physics.add.collider(gameState.player, gameState.platforms);
         this.physics.add.collider(gameState.player, gameState.step);
@@ -107,11 +126,27 @@ class GameScene extends Phaser.Scene{
           gameState.player.setVelocityY(-gameState.jumpPower*1.5);
         })
         
+
 		    gameState.cursors = this.input.keyboard.createCursorKeys();  
         //camera setting
         this.cameras.main.setBounds(0, 0, gameState.width, gameState.height);
         this.physics.world.setBounds(0, 0, gameState.width, gameState.height);
         this.cameras.main.startFollow(gameState.player,true,0.5,0.5); 
+
+    // player dead when overlap with zombie
+    if(gameState.zombie){     
+      this.physics.add.overlap(gameState.player, gameState.zombiesGroup, () => {
+        this.add.text(gameState.player.body.position.x,gameState.player.body.position.y,
+           '      Game Over...\n  Click to play again.', { fontFamily: 'Georgia', fontSize: 36, color: '#ffffff' });
+        this.physics.pause();
+        gameState.active = false;
+        this.anims.pauseAll();
+        // Restarts the scene if a mouse click is detected
+        this.input.on('pointerup', () => {
+          this.scene.restart();
+        })
+      });
+  }
     }
 
 
@@ -123,14 +158,24 @@ class GameScene extends Phaser.Scene{
       }
 
  createTrampoline(xIndex, yIndex) {
-   /*  if ( yIndex === 0){
-      gameState.trampoline.create((60 * xIndex),  720-((yIndex-1) * 60)-45, 'trampoline').setScale(0.0625).refreshBody();
-    } */
     if (typeof yIndex === 'number' && typeof xIndex === 'number') {
       gameState.trampoline.create((60 * xIndex),  720-(yIndex * 60)-45, 'trampoline').setScale(0.0625).refreshBody();
     }
-    
 }
+
+  createZombie(xIndex, yIndex){
+    gameState.zombie = gameState.zombiesGroup.create(xIndex * 60 , 720-(yIndex * 60) ,'zombie').setScale(0.45);
+    this.physics.add.collider(gameState.zombie, gameState.platforms);
+    gameState.zombieMove= this.tweens.add({
+      targets: gameState.zombie,
+      x: (xIndex * 60) + 200,
+      ease: 'Linear',
+      duration: 1500,
+      repeat: -1,
+      yoyo: true,
+      flipX : true
+    });
+  }
 
  
   //setup static object    
@@ -143,8 +188,12 @@ class GameScene extends Phaser.Scene{
   trampolineSetup(){
     for( let i= 0 ; i< (this.levelTrampolineSetup).length; i++){
       this.createTrampoline(this.levelTrampolineSetup[i][0],this.levelTrampolineSetup[i][1]);
-  }
-  }
+  }}
+
+  zombieSetup(){
+    for( let i= 0 ; i< (this.levelZombieSetup).length; i++){
+      this.createZombie(this.levelZombieSetup[i][0],this.levelZombieSetup[i][1]);
+  }}
 
   // create leaf particle
   createLeaf() {
@@ -152,20 +201,20 @@ class GameScene extends Phaser.Scene{
 
     gameState.emitter = gameState.particles.createEmitter({
       x: {min: 0, max: config.width },
-      y:  {min: -20, max: 0  },
+      y:  {min: -20, max: 300  },
       lifespan: 2000,
-      speedY: { min: 50, max: 100 },
+      speedY: { min: 50, max: 150 },
       speedX: { min: 0, max: -50 },
-      scale: { start: 0.017, end: 0.015 },
+      scale: { start: 0.017, end: 0.005 },
       quantity: 1,
-      blendMode: 'MULTIPLY'
+      blendMode: 'ADD'
     })
     gameState.emitter.setScrollFactor(0.1);
   }
 
   
      update()
-    {
+    { if( gameState.active){
         if(gameState.cursors.left.isDown){
             gameState.player.setVelocityX(-gameState.playerSpeed);
             gameState.player.flipX= true;
@@ -176,13 +225,7 @@ class GameScene extends Phaser.Scene{
             gameState.player.flipX= false;
             gameState.player.anims.play('run',true);
 
-         } /* else if(gameState.cursors.down.isDown){
-            gameState.player.anims.play('crawl',true);// still error not collide and padding not reduced
-            
-            
-         } */
-         
-         else if( (Phaser.Input.Keyboard.JustDown(gameState.cursors.space) || Phaser.Input.Keyboard.JustDown(gameState.cursors.up)) &&
+         } else if( (Phaser.Input.Keyboard.JustDown(gameState.cursors.space) || Phaser.Input.Keyboard.JustDown(gameState.cursors.up)) &&
         gameState.player.body.touching.down){
             gameState.player.setVelocityY(-gameState.jumpPower);
            
@@ -201,7 +244,11 @@ class GameScene extends Phaser.Scene{
             this.scene.start(this.nextLevel[this.levelKey]);
             
         }
-       
+        if( gameState.zombie){
+          gameState.zombie.anims.play('walk',true);
+          gameState.zombieMove.play();
+        }
+      }
        //text caption
        const caption= document.querySelector('.caption');
        caption.textContent=this.levelKey;
@@ -215,8 +262,6 @@ class GameScene extends Phaser.Scene{
  // left to right and down to up coordinate
  // if y is zero it is on ground platform
  // format [x,y]
-
-
  // min trampoline coordinate y to reach sky = 4
  // min step coordinate y to reach skt = 8
 
@@ -265,6 +310,19 @@ class Level1 extends GameScene {
     }
   }
 
+  class Level5 extends GameScene {
+    constructor() {
+      super('Level5')
+      
+      this.levelStepSetup = [
+        [25,4],[25,5],[5,1],[8,6],[19,4],[26,2],[26,7],[28,2],[32,1],[35,2],[36,2],[37,5],[42,4]
+        
+];
+      this.levelTrampolineSetup = [[19,4],[42,4],[32,1]];
+      this.levelZombieSetup = [[5,1],[10,1],[3,1],[15,1]];
+    }
+  }
+
 let config = {
     type: Phaser.AUTO,
     width: 800,
@@ -279,7 +337,7 @@ let config = {
         }
     },
     backgroundColor: "F1FAEF",
-    scene: [Level1,Level2,Level3,Level4]
+    scene: [Level1,Level2,Level3,Level4,Level5]
 };
 
 

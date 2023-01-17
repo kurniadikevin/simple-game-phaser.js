@@ -1,6 +1,9 @@
 WORK IN PROGRESS 
 
--Add another entity than can kill you
+
 - Add more dynamic item and animation
 - add more level
 - make scene for start , end, and in between level
+
+bug 
+-zombie walk animation stopped

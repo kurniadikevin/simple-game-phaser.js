@@ -246,8 +246,11 @@ class GameScene extends Phaser.Scene{
             this.scene.start(this.nextLevel[this.levelKey]);
             
         }
-        if( gameState.zombie){
-          gameState.zombie.anims.play('walk',true);
+        
+       if( gameState.zombie ){ 
+         gameState.zombiesGroup.children.entries.forEach((item)=>{
+          item.anims.play('walk',true);
+         })
           gameState.zombieMove.play();
         }
       }

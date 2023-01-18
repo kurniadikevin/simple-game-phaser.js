@@ -1,8 +1,9 @@
 const gameState = {
- playerSpeed : 200,
+ playerSpeed : 250,
  jumpPower : 300,
  width : 3000,
  height : 900,
+ isFlying : false,
 }
 
 class GameScene extends Phaser.Scene{
@@ -16,6 +17,8 @@ class GameScene extends Phaser.Scene{
           'Level4': 'Level5',
         }
 	}
+
+  
 
      preload ()
     {
@@ -51,7 +54,8 @@ class GameScene extends Phaser.Scene{
 
         gameState.backgroundTree = this.add.image(960, 450, 'bgImg2').setScale(1);
         gameState.backgroundTreeMirror = this.add.image(2880, 450, 'bgImg2').setScale(1);
-
+        gameState.backgroundTreeMirror.flipX= true;
+       
         gameState.player = this.physics.add.sprite(50,600, 'player')
         .setScale(0.15);
         
@@ -67,8 +71,9 @@ class GameScene extends Phaser.Scene{
         gameState.trampoline = this.physics.add.staticGroup();
 
         //create audio
-        gameState.jumpSound = this.sound.add('jumpSound',{loop : false});
+        gameState.jumpSound = this.sound.add('jumpSound',{loop : false, volume : 0.5});
         gameState.playerStepSound = this.sound.add('playerStepSound',{loop: true});
+        gameState.playerStepSound.setRate(1.5);
         gameState.zombieDeathSound = this.sound.add('zombieDeathSound',{loop : false});
         gameState.winningSound = this.sound.add('winningSound',{loop : false});
     
@@ -131,10 +136,11 @@ class GameScene extends Phaser.Scene{
 
 
         gameState.player.setCollideWorldBounds(true);
-        this.physics.add.collider(gameState.player, gameState.platforms);
+        this.physics.add.collider(gameState.player, gameState.platforms)
         this.physics.add.collider(gameState.player, gameState.step);
         this.physics.add.collider(gameState.player,gameState.trampoline,function(){
           gameState.player.setVelocityY(-gameState.jumpPower*1.5);
+          gameState.playerStepSound.stop();
           gameState.jumpSound.play();
         })
         
@@ -162,7 +168,7 @@ class GameScene extends Phaser.Scene{
   }
     }
 
-
+    
     // create static object in game
  createStep(xIndex, yIndex) {
           if (typeof yIndex === 'number' && typeof xIndex === 'number') {
@@ -231,16 +237,18 @@ class GameScene extends Phaser.Scene{
      update()
     { if( gameState.active){
         if(gameState.cursors.left.isDown){
-            if( gameState.player.body.touching.down){
+            if( gameState.player.body.touching.down && gameState.isFlying === false){
               gameState.playerStepSound.play();
+              gameState.isFlying = true;
             }
             gameState.player.setVelocityX(-gameState.playerSpeed);
             gameState.player.flipX= true;
             gameState.player.anims.play('run',true);
 
-         } else if( gameState.cursors.right.isDown){
-            if( gameState.player.body.touching.down){
+         } else if( gameState.cursors.right.isDown ){
+            if( gameState.player.body.touching.down && gameState.isFlying === false){
             gameState.playerStepSound.play();
+            gameState.isFlying = true;
           }
             gameState.player.setVelocityX(gameState.playerSpeed);
             gameState.player.flipX= false;
@@ -250,11 +258,14 @@ class GameScene extends Phaser.Scene{
          } else if( (Phaser.Input.Keyboard.JustDown(gameState.cursors.space) || Phaser.Input.Keyboard.JustDown(gameState.cursors.up)) &&
         gameState.player.body.touching.down){
             gameState.player.setVelocityY(-gameState.jumpPower);
+            gameState.playerStepSound.stop();
             gameState.jumpSound.play();
            
         }
            else if(gameState.cursors.up.isDown || gameState.cursors.space.isDown) {
                 gameState.player.anims.play('jump',true);
+                gameState.playerStepSound.stop();
+
             }
           
            
@@ -262,6 +273,7 @@ class GameScene extends Phaser.Scene{
             gameState.player.setVelocityX(0);
             gameState.player.anims.play('idle',true);
             gameState.playerStepSound.stop();
+            gameState.isFlying= false;
         }
 
         //winning condition
@@ -367,7 +379,7 @@ let config = {
         }
     },
     backgroundColor: "F1FAEF",
-    scene: [Level1]
+    scene: [Level4]
 };
 
 

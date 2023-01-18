@@ -6,4 +6,4 @@ WORK IN PROGRESS
 - make scene for start , end, and in between level
 
 bug 
--zombie walk animation stopped
+-audio loop when collid player and step with trampoline from side

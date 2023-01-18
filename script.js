@@ -73,7 +73,7 @@ class GameScene extends Phaser.Scene{
         //create audio
         gameState.jumpSound = this.sound.add('jumpSound',{loop : false, volume : 0.5});
         gameState.playerStepSound = this.sound.add('playerStepSound',{loop: true});
-        gameState.playerStepSound.setRate(1.5);
+        gameState.playerStepSound.setRate(1.5);// change audio playback speed
         gameState.zombieDeathSound = this.sound.add('zombieDeathSound',{loop : false});
         gameState.winningSound = this.sound.add('winningSound',{loop : false});
     
@@ -379,7 +379,7 @@ let config = {
         }
     },
     backgroundColor: "F1FAEF",
-    scene: [Level4]
+    scene: [Level1,Level2,Level3,Level4,Level5]
 };
 
 

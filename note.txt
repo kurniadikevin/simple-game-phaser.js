@@ -7,3 +7,4 @@ WORK IN PROGRESS
 
 bug 
 -audio loop when collid player and step with trampoline from side
+- walking bug animation and sound looping on level5

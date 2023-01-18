@@ -1,3 +1,4 @@
+
 const gameState = {
  playerSpeed : 250,
  jumpPower : 300,
@@ -11,10 +12,13 @@ class GameScene extends Phaser.Scene{
 		super( key );
         this.levelKey = key
         this.nextLevel = {
+          'StartScene' : 'Level1',
           'Level1': 'Level2',
           'Level2': 'Level3',
           'Level3': 'Level4',
           'Level4': 'Level5',
+          'Level5' : 'EndScene',
+          'EndScene' :'Level1'
         }
 	}
 
@@ -41,12 +45,21 @@ class GameScene extends Phaser.Scene{
         this.load.audio('playerStepSound',['./assets/audio/snow_step_dry-02.mp3']);  
         this.load.audio('zombieDeathSound',['./assets/audio/zombie-roar1.wav']);
         this.load.audio('winningSound',['./assets/audio/bell.wav']);
+
+        
+      /*   if(this.staticScene && this.startScene){
+        this.add.text(400,300,'Click to Start Game!',{fontSize: '27pt', fontFamily:'Heebo'})
+        } 
+        if( this.endScene){
+          this.add.text(400,300,'Congratulation you finish all level!',{fontSize: '27pt', fontFamily:'Heebo'})
+        } */
       }
 
 
      create ()
     {
         gameState.active = true;
+
         
         gameState.background =this.add.image(960, 300, 'bgImg1').setScale(1);
         gameState.backgroundMirror =this.add.image(2880, 300, 'bgImg1').setScale(1);
@@ -56,6 +69,13 @@ class GameScene extends Phaser.Scene{
         gameState.backgroundTreeMirror = this.add.image(2880, 450, 'bgImg2').setScale(1);
         gameState.backgroundTreeMirror.flipX= true;
        
+        if(this.staticScene && this.startScene){
+          gameState.startText= this.add.text(240,600,'Click to Start Game!',{fontSize: '27pt', fontFamily:'Heebo'})
+           }
+        if( this.staticScene && this.EndScene){
+            this.add.text(170,500,'Congratulations! you finish all level',{fontSize: '24pt', fontFamily:'Heebo'})
+          }
+
         gameState.player = this.physics.add.sprite(50,600, 'player')
         .setScale(0.15);
         
@@ -235,7 +255,7 @@ class GameScene extends Phaser.Scene{
 
   
      update()
-    { if( gameState.active){
+    { if( gameState.active && this.staticScene===false){
         if(gameState.cursors.left.isDown){
             if( gameState.player.body.touching.down && gameState.isFlying === false){
               gameState.playerStepSound.play();
@@ -291,6 +311,14 @@ class GameScene extends Phaser.Scene{
           gameState.zombieMove.play();
         }
       }
+    if(this.staticScene) {
+        this.input.on('pointerup',()=>{
+          gameState.winningSound.play();
+          this.staticScene=false;
+          this.scene.stop(this.levelKey);
+          this.scene.start(this.nextLevel[this.levelKey]);
+        })
+      }
        //text caption
        const caption= document.querySelector('.caption');
        caption.textContent=this.levelKey;
@@ -307,10 +335,30 @@ class GameScene extends Phaser.Scene{
  // min trampoline coordinate y to reach sky = 4
  // min step coordinate y to reach skt = 8
 
+ class StartScene extends GameScene {
+    constructor(){
+      super('StartScene');
+    this.staticScene= true;
+    this.startScene = true;
+  }
+  
+ }
+
+ class EndScene extends GameScene {
+  constructor(){
+    super('EndScene');
+    this.staticScene=true;
+    this.EndScene= true;
+}
+
+}
+
+
+ 
 class Level1 extends GameScene {
     constructor() {
       super('Level1')
-      
+      this.staticScene= false;
       this.levelStepSetup = [
         [5,0],[6,0],[7,1],[9,3],[10,4],[10.5,4],[11,4],[13,4], [15,5],
         [17,7],[19,4],[20,4],[22,2],[5,3],[18,8]
@@ -322,6 +370,7 @@ class Level1 extends GameScene {
   class Level2 extends GameScene {
     constructor() {
       super('Level2')
+      this.staticScene= false;
       this.levelStepSetup = [  [5,0],[6,1],[7,2],[8,3],[9,4]];
    this.levelTrampolineSetup =[  [4,-1],  [5,0],[6,1],[7,2],[8,3],[9,4] ];
     
@@ -331,7 +380,7 @@ class Level1 extends GameScene {
   class Level3 extends GameScene {
     constructor() {
       super('Level3')
-      
+      this.staticScene= false;
       this.levelStepSetup = [
         [5,0],[6,0],[7,1],[9,3],[10,4],[10.5,4],[11,4],[13,4], [15,5],
         [17,7],[19,4],[20,4],[22,2],[5,3],[18,7]
@@ -343,7 +392,7 @@ class Level1 extends GameScene {
   class Level4 extends GameScene {
     constructor() {
       super('Level4')
-      
+      this.staticScene= false;
       this.levelStepSetup = [
         [25,4],[25,5],[5,1],[8,6],[19,4],[26,2],[26,7],[28,2],[32,1],[35,2],[36,2],[37,5],[42,4]
         
@@ -355,7 +404,7 @@ class Level1 extends GameScene {
   class Level5 extends GameScene {
     constructor() {
       super('Level5')
-      
+      this.staticScene= false;
       this.levelStepSetup = [
         [25,4],[25,5],[5,1],[8,6],[19,4],[26,2],[26,7],[28,2],[32,1],[35,2],[36,2],[37,5],[42,4]
         
@@ -379,7 +428,7 @@ let config = {
         }
     },
     backgroundColor: "F1FAEF",
-    scene: [Level1,Level2,Level3,Level4,Level5]
+    scene: [Level4,Level5,EndScene]
 };
 
 

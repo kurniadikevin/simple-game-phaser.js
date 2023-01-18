@@ -33,7 +33,12 @@ class GameScene extends Phaser.Scene{
         this.load.image('stoneStep','./assets/stoneMedium.png');
         this.load.image('trampoline','./assets/trampoline-crop.png');
         this.load.image('leaf','./assets/leaf.png');
-    }
+
+        this.load.audio('jumpSound',['./assets/audio/slime_jump.wav','./assets/audio/slime_jump.mp3']);
+        this.load.audio('playerStepSound',['./assets/audio/snow_step_dry-02.mp3']);  
+        this.load.audio('zombieDeathSound',['./assets/audio/zombie-roar1.wav']);
+        this.load.audio('winningSound',['./assets/audio/bell.wav']);
+      }
 
 
      create ()
@@ -60,6 +65,12 @@ class GameScene extends Phaser.Scene{
 
         gameState.step = this.physics.add.staticGroup();
         gameState.trampoline = this.physics.add.staticGroup();
+
+        //create audio
+        gameState.jumpSound = this.sound.add('jumpSound',{loop : false});
+        gameState.playerStepSound = this.sound.add('playerStepSound',{loop: true});
+        gameState.zombieDeathSound = this.sound.add('zombieDeathSound',{loop : false});
+        gameState.winningSound = this.sound.add('winningSound',{loop : false});
     
         // setup static object if there is one
         if(this.levelStepSetup){
@@ -124,6 +135,7 @@ class GameScene extends Phaser.Scene{
         this.physics.add.collider(gameState.player, gameState.step);
         this.physics.add.collider(gameState.player,gameState.trampoline,function(){
           gameState.player.setVelocityY(-gameState.jumpPower*1.5);
+          gameState.jumpSound.play();
         })
         
 
@@ -136,6 +148,7 @@ class GameScene extends Phaser.Scene{
     // player dead when overlap with zombie
     if(gameState.zombie){     
       this.physics.add.overlap(gameState.player, gameState.zombiesGroup, () => {
+        gameState.zombieDeathSound.play();
         this.add.text(gameState.player.body.position.x,gameState.player.body.position.y,
            '      Game Over...\n  Click to play again.', { fontFamily: 'Georgia', fontSize: 36, color: '#ffffff' });
         this.physics.pause();
@@ -218,30 +231,42 @@ class GameScene extends Phaser.Scene{
      update()
     { if( gameState.active){
         if(gameState.cursors.left.isDown){
+            if( gameState.player.body.touching.down){
+              gameState.playerStepSound.play();
+            }
             gameState.player.setVelocityX(-gameState.playerSpeed);
             gameState.player.flipX= true;
             gameState.player.anims.play('run',true);
 
          } else if( gameState.cursors.right.isDown){
+            if( gameState.player.body.touching.down){
+            gameState.playerStepSound.play();
+          }
             gameState.player.setVelocityX(gameState.playerSpeed);
             gameState.player.flipX= false;
             gameState.player.anims.play('run',true);
+           
 
          } else if( (Phaser.Input.Keyboard.JustDown(gameState.cursors.space) || Phaser.Input.Keyboard.JustDown(gameState.cursors.up)) &&
         gameState.player.body.touching.down){
             gameState.player.setVelocityY(-gameState.jumpPower);
+            gameState.jumpSound.play();
            
         }
-            else if(gameState.cursors.up.isDown || gameState.cursors.space.isDown) {
+           else if(gameState.cursors.up.isDown || gameState.cursors.space.isDown) {
                 gameState.player.anims.play('jump',true);
             }
+          
            
         else{
             gameState.player.setVelocityX(0);
             gameState.player.anims.play('idle',true);
+            gameState.playerStepSound.stop();
         }
 
+        //winning condition
          if (gameState.player.body.position.y === 0){
+            gameState.winningSound.play();
             this.scene.stop(this.levelKey);
             this.scene.start(this.nextLevel[this.levelKey]);
             
@@ -342,7 +367,7 @@ let config = {
         }
     },
     backgroundColor: "F1FAEF",
-    scene: [Level5]
+    scene: [Level1]
 };
 
 

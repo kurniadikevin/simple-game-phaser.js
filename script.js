@@ -428,7 +428,7 @@ let config = {
         }
     },
     backgroundColor: "F1FAEF",
-    scene: [Level4,Level5,EndScene]
+    scene: [StartScene,Level1,Level2,Level3,Level4,Level5,EndScene]
 };
 
 

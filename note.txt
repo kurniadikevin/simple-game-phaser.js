@@ -3,8 +3,7 @@ WORK IN PROGRESS
 
 - Add more dynamic item and animation
 - add more level
-- make scene for start , end, and in between level
+
 
 bug 
 -audio loop when collid player and step with trampoline from side
-- walking bug animation and sound looping on level5

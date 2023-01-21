@@ -17,8 +17,9 @@ class GameScene extends Phaser.Scene{
           'Level2': 'Level3',
           'Level3': 'Level4',
           'Level4': 'Level5',
-          'Level5' : 'EndScene',
-          'EndScene' :'Level1'
+          'Level5' : 'Level6',
+          'Level6' : 'EndScene'
+         
         }
 	}
 
@@ -45,20 +46,13 @@ class GameScene extends Phaser.Scene{
         this.load.audio('playerStepSound',['./assets/audio/snow_step_dry-02.mp3']);  
         this.load.audio('zombieDeathSound',['./assets/audio/zombie-roar1.wav']);
         this.load.audio('winningSound',['./assets/audio/bell.wav']);
-
-        
-      /*   if(this.staticScene && this.startScene){
-        this.add.text(400,300,'Click to Start Game!',{fontSize: '27pt', fontFamily:'Heebo'})
-        } 
-        if( this.endScene){
-          this.add.text(400,300,'Congratulation you finish all level!',{fontSize: '27pt', fontFamily:'Heebo'})
-        } */
       }
 
 
      create ()
     {
         gameState.active = true;
+        this.anims.resumeAll();//resume animation if player dead
 
         
         gameState.background =this.add.image(960, 300, 'bgImg1').setScale(1);
@@ -72,8 +66,9 @@ class GameScene extends Phaser.Scene{
         if(this.staticScene && this.startScene){
           gameState.startText= this.add.text(240,600,'Click to Start Game!',{fontSize: '27pt', fontFamily:'Heebo'})
            }
-        if( this.staticScene && this.EndScene){
-            this.add.text(170,500,'Congratulations! you finish all level',{fontSize: '24pt', fontFamily:'Heebo'})
+        if( this.staticScene && this.endScene){
+           gameState.endGameText= this.add.text(170,500,'Congratulations! you finish all level',{fontSize: '24pt', fontFamily:'Heebo'})
+            gameState.endGameRestart = this.add.text(170,540,'Click to Restart Game.',{fontSize: '22pt', fontFamily:'Heebo'})
           }
 
         gameState.player = this.physics.add.sprite(50,600, 'player')
@@ -256,6 +251,7 @@ class GameScene extends Phaser.Scene{
   
      update()
     { if( gameState.active && this.staticScene===false){
+        
         if(gameState.cursors.left.isDown){
             if( gameState.player.body.touching.down && gameState.isFlying === false){
               gameState.playerStepSound.play();
@@ -311,7 +307,7 @@ class GameScene extends Phaser.Scene{
           gameState.zombieMove.play();
         }
       }
-    if(this.staticScene) {
+    if(this.startScene) {
         this.input.on('pointerup',()=>{
           gameState.winningSound.play();
           this.staticScene=false;
@@ -319,9 +315,15 @@ class GameScene extends Phaser.Scene{
           this.scene.start(this.nextLevel[this.levelKey]);
         })
       }
+      if(this.endScene) {
+        this.input.on('pointerup',()=>{
+          gameState.winningSound.play();
+          location.reload()
+        })
+      }
        //text caption
-       const caption= document.querySelector('.caption');
-       caption.textContent=this.levelKey;
+       const caption= document.querySelector('.caption');      
+       caption.textContent= this.levelKey;
 
     }
 }
@@ -348,7 +350,7 @@ class GameScene extends Phaser.Scene{
   constructor(){
     super('EndScene');
     this.staticScene=true;
-    this.EndScene= true;
+    this.endScene= true;
 }
 
 }
@@ -414,6 +416,20 @@ class Level1 extends GameScene {
     }
   }
 
+  class Level6 extends GameScene {
+    constructor() {
+      super('Level6')
+      this.staticScene= false;
+      this.levelStepSetup = [
+        [25,4],[25,5],[5,1],[8,6],[19,2],[26,2],[26,7],[28,2],[32,1],[35,2],[36,2],[37,5],[42,3],[43.5,3],
+        [44,4]
+        
+];
+      this.levelTrampolineSetup = [[19,2],[42,3],[32,1],[44,4]];
+      this.levelZombieSetup = [[5,1],[10,1],[13,1],[18,1],[19,1],[23,1],[29,1]];
+    }
+  }
+
 let config = {
     type: Phaser.AUTO,
     width: 800,
@@ -428,7 +444,7 @@ let config = {
         }
     },
     backgroundColor: "F1FAEF",
-    scene: [StartScene,Level1,Level2,Level3,Level4,Level5,EndScene]
+    scene: [StartScene,Level1,Level2,Level3,Level4,Level5,Level6,EndScene]
 };
 
 

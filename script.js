@@ -23,16 +23,12 @@ class GameScene extends Phaser.Scene{
         }
 	}
 
-  
-
      preload ()
     {
 
         this.load.image('bgImg1', 'assets/mountain-background.jpg');
         this.load.spritesheet('player', 'assets/flatboySS-noPadding.png'
         ,{ frameWidth: 350, frameHeight: 500 });
-       this.load.spritesheet('playerCrawl', 'assets/crawl-ss.png'
-        ,{ frameWidth: 481, frameHeight: 282 });//not used yet
         this.load.spritesheet('zombie','./assets/zombie-enemy.png',{
           frameWidth : 103, frameHeight : 139.75});
 
@@ -46,7 +42,7 @@ class GameScene extends Phaser.Scene{
         this.load.audio('playerStepSound',['./assets/audio/snow_step_dry-02.mp3']);  
         this.load.audio('zombieDeathSound',['./assets/audio/zombie-roar1.wav']);
         this.load.audio('winningSound',['./assets/audio/bell.wav']);
-      }
+    }
 
 
      create ()
@@ -58,6 +54,7 @@ class GameScene extends Phaser.Scene{
         gameState.background =this.add.image(960, 300, 'bgImg1').setScale(1);
         gameState.backgroundMirror =this.add.image(2880, 300, 'bgImg1').setScale(1);
         gameState.backgroundMirror.flipX = true;
+
 
         gameState.backgroundTree = this.add.image(960, 450, 'bgImg2').setScale(1);
         gameState.backgroundTreeMirror = this.add.image(2880, 450, 'bgImg2').setScale(1);
@@ -91,6 +88,8 @@ class GameScene extends Phaser.Scene{
         gameState.playerStepSound.setRate(1.5);// change audio playback speed
         gameState.zombieDeathSound = this.sound.add('zombieDeathSound',{loop : false});
         gameState.winningSound = this.sound.add('winningSound',{loop : false});
+
+        
     
         // setup static object if there is one
         if(this.levelStepSetup){
@@ -106,7 +105,15 @@ class GameScene extends Phaser.Scene{
         }
         this.createLeaf();
        
-
+        //create tint
+        if(this.tintAlpha){
+          const posX = 0, posY = 0;
+          //const { width, height } = this.sys.game.scale.gameSize;
+          const color = 0xA72731;
+          const tintAlpha = 0.25;
+          const darkScreen = this.add.rectangle(posX, posY, 3000, 900, color, tintAlpha)
+          darkScreen.setOrigin(0, 0);
+          }
        
         //ANIMATION FOR SPRITESHEET
         //run
@@ -133,13 +140,6 @@ class GameScene extends Phaser.Scene{
             repeat: -1
           });
           
-          //crawl
-          this.anims.create({
-            key : 'crawl',
-            frames: this.anims.generateFrameNumbers('playerCrawl', { start: 0, end: 1 }),
-            frameRate: 10,
-            repeat: -1
-          })
 
           //zombie anims
           this.anims.create({
@@ -407,6 +407,7 @@ class Level1 extends GameScene {
     constructor() {
       super('Level5')
       this.staticScene= false;
+      this.tintAlpha=0.25;
       this.levelStepSetup = [
         [25,4],[25,5],[5,1],[8,6],[19,4],[26,2],[26,7],[28,2],[32,1],[35,2],[36,2],[37,5],[42,4]
         
@@ -420,6 +421,7 @@ class Level1 extends GameScene {
     constructor() {
       super('Level6')
       this.staticScene= false;
+      this.tintAlpha=0.25;
       this.levelStepSetup = [
         [25,4],[25,5],[5,1],[8,6],[19,2],[26,2],[26,7],[28,2],[32,1],[35,2],[36,2],[37,5],[42,3],[43.5,3],
         [44,4]

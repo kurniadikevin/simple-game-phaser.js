@@ -6,4 +6,4 @@ WORK IN PROGRESS
 
 
 bug 
--audio loop when collid player and step with trampoline from side
+-audio loop when collide player and step with trampoline from side

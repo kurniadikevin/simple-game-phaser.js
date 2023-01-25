@@ -4,6 +4,7 @@ body{
     display: flex;
     justify-content: center;
     margin-top: 50px;
+    background-color: rgb(15,15,15);
 }
 
 .caption{
@@ -17,8 +18,8 @@ body{
 
 .rule{
     position: absolute;
-    top: 670px;
+    top: 650px;
     font-family: 'Heebo', sans-serif;
-    color: #4D4337;  
+    color: white; 
     font-size: 30px;
 }
